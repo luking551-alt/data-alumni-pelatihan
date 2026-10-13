@@ -1,0 +1,952 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Alumni Peserta Pelatihan</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    header {
+      background: #12365b;
+      color: white;
+      padding: 24px;
+    }
+
+    header h1 { font-size: 25px; margin-bottom: 8px; }
+    header p { color: #dbeafe; font-size: 14px; }
+
+    main {
+      max-width: 1250px;
+      margin: 26px auto;
+      padding: 0 18px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .card, .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 3px 12px #0f172a0c;
+    }
+
+    .card p {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .card h2 { font-size: 29px; color: #12365b; }
+    .panel { margin-bottom: 22px; }
+    .panel h2 { font-size: 19px; margin-bottom: 18px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label { font-size: 13px; font-weight: bold; color: #334155; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font: inherit;
+      font-size: 14px;
+      background: white;
+      color: #1e293b;
+    }
+
+    textarea { min-height: 42px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #93c5fd;
+      border-color: #2563eb;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: 0;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .primary { background: #12365b; color: white; }
+    .secondary { background: #e2e8f0; color: #1e293b; }
+    .success { background: #15803d; color: white; }
+    .danger { background: #dc2626; color: white; }
+    .warning { background: #f59e0b; color: #422006; }
+    button:hover:not(:disabled) { filter: brightness(.94); }
+
+    .table-tools {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .search { max-width: 380px; }
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1000px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eff6ff;
+      color: #12365b;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: #f8fafc; }
+
+    .row-actions { display: flex; gap: 6px; }
+    .row-actions button { padding: 7px 9px; }
+    .empty { text-align: center; color: #64748b; padding: 28px; }
+
+    .preview-note {
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 520px) {
+      header { padding: 20px 16px; }
+      header h1 { font-size: 21px; }
+      main { padding: 0 12px; margin-top: 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .card, .panel { padding: 17px; }
+      .search { max-width: none; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>DATA ALUMNI</h1>
+  <p>Sistem Informasi Alumni Peserta Pelatihan</p>
+</header>
+
+<main>
+  <section class="stats">
+    <div class="card">
+      <p>Total Alumni</p>
+      <h2 id="totalAlumni">0</h2>
+    </div>
+    <div class="card">
+      <p>Tahun Pelatihan</p>
+      <h2 id="totalTahun">0</h2>
+    </div>
+    <div class="card">
+      <p>Program Pelatihan</p>
+      <h2 id="totalProgram">0</h2>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 id="formTitle">Tambah Data Alumni</h2>
+
+    <form id="alumniForm">
+      <div class="form-grid">
+        <div class="field">
+          <label for="nama">Nama lengkap *</label>
+          <input id="nama" maxlength="150" required>
+        </div>
+
+        <div class="field">
+          <label for="nomorInduk">Nomor induk *</label>
+          <input id="nomorInduk" maxlength="50" required>
+        </div>
+
+        <div class="field">
+          <label for="tahun">Tahun pelatihan</label>
+          <input id="tahun" type="number" min="1900" max="2200"
+                 placeholder="Contoh: 2026">
+        </div>
+
+        <div class="field">
+          <label for="status">Status</label>
+          <select id="status">
+            <option value="">Pilih status</option>
+            <option value="Lulus">Lulus</option>
+            <option value="Belum Lulus">Belum Lulus</option>
+            <option value="Aktif">Aktif</option>
+            <option value="Nonaktif">Nonaktif</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="tanggal">Tanggal pendataan</label>
+          <input id="tanggal" type="date">
+        </div>
+
+        <div class="field">
+          <label for="program">Program pelatihan</label>
+          <input id="program" maxlength="150" placeholder="Nama program">
+        </div>
+
+        <div class="field">
+          <label for="ktp">Nomor KTP</label>
+          <input id="ktp" type="text" inputmode="numeric"
+                 maxlength="32" placeholder="Nomor KTP">
+        </div>
+
+        <div class="field">
+          <label for="telepon">Nomor telepon</label>
+          <input id="telepon" type="text" inputmode="tel"
+                 maxlength="25" placeholder="08xxxxxxxxxx">
+        </div>
+
+        <div class="field">
+          <label for="alamat">Alamat</label>
+          <textarea id="alamat" maxlength="500"
+                    placeholder="Alamat lengkap"></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="primary" id="saveBtn">
+          Simpan Data
+        </button>
+        <button type="button" class="secondary" id="resetBtn">
+          Reset Formulir
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Daftar Alumni</h2>
+
+    <div class="table-tools">
+      <input class="search" id="search"
+             placeholder="Cari nama atau nomor induk...">
+
+      <span id="jumlahData">0 data</span>
+
+      <div class="actions" style="margin-top:0">
+        <button type="button" class="success" id="exportBtn">
+          ⬇ Download Excel
+        </button>
+
+        <button type="button" class="primary" id="importBtn">
+          ⬆ Upload Excel
+        </button>
+
+        <button type="button" class="secondary" id="templateBtn">
+          ▤ Download Template
+        </button>
+
+        <input type="file" id="excelFile"
+               accept=".xlsx,.xls" hidden>
+      </div>
+    </div>
+
+    <div id="previewPanel" hidden style="margin-bottom:22px">
+      <h3 style="margin-bottom:10px">Pratinjau Import Excel</h3>
+      <p id="previewInfo" class="preview-note"></p>
+
+      <div class="table-wrap">
+        <table style="min-width:1100px">
+          <thead id="previewHead"></thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="success" id="confirmImportBtn" disabled>
+          Konfirmasi dan Simpan
+        </button>
+        <button type="button" class="secondary" id="cancelImportBtn">
+          Batal
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Nama lengkap</th>
+            <th>Nomor induk</th>
+            <th>Tahun</th>
+            <th>Status</th>
+            <th>Tanggal</th>
+            <th>Program pelatihan</th>
+            <th>Nomor KTP</th>
+            <th>Nomor telepon</th>
+            <th>Alamat</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="alumniTable">
+          <tr>
+            <td colspan="11" class="empty">Belum ada data alumni.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>Data Alumni Peserta Pelatihan &copy; 2026</footer>
+
+<!-- Library Excel: harus berada sebelum script aplikasi -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "data_alumni_pelatihan_demo_v1";
+const $ = id => document.getElementById(id);
+const form = $("alumniForm");
+
+let alumni = [];
+let editId = null;
+let pendingImport = [];
+let importHasErrors = false;
+
+const excelHeaders = [
+  "Nama Lengkap",
+  "Nomor Induk",
+  "Tahun",
+  "Status",
+  "Tanggal Pendataan",
+  "Program Pelatihan",
+  "Nomor KTP",
+  "Nomor Telepon",
+  "Alamat"
+];
+
+const fieldKeys = [
+  "nama", "nomorInduk", "tahun", "status", "tanggal",
+  "program", "ktp", "telepon", "alamat"
+];
+
+function buatId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function normalisasi(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function rapikanRecord(a) {
+  return {
+    id: String(a.id || buatId()),
+    nama: String(a.nama ?? ""),
+    nomorInduk: String(a.nomorInduk ?? ""),
+    tahun: String(a.tahun ?? ""),
+    status: String(a.status ?? ""),
+    tanggal: String(a.tanggal ?? ""),
+    program: String(a.program ?? ""),
+    ktp: String(a.ktp ?? ""),
+    telepon: String(a.telepon ?? ""),
+    alamat: String(a.alamat ?? "")
+  };
+}
+
+// Muat data yang sudah tersimpan tanpa menghapus data lama.
+try {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  if (Array.isArray(saved)) {
+    alumni = saved.map(rapikanRecord);
+  }
+} catch (error) {
+  console.error("Gagal membaca data lokal:", error);
+  alert("Data lokal tidak dapat dibaca. Periksa penyimpanan browser.");
+}
+
+function simpanLokal() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(alumni));
+}
+
+function ambilForm() {
+  const tahunValue = $("tahun").value.trim();
+
+  if (tahunValue &&
+      (!/^\d{4}$/.test(tahunValue) ||
+       Number(tahunValue) < 1900 ||
+       Number(tahunValue) > 2200)) {
+    throw new Error("Tahun pelatihan harus berupa tahun yang valid.");
+  }
+
+  const nomorInduk = $("nomorInduk").value.trim();
+
+  if (alumni.some(a =>
+    normalisasi(a.nomorInduk) === normalisasi(nomorInduk) &&
+    a.id !== editId
+  )) {
+    throw new Error("Nomor induk sudah terdaftar.");
+  }
+
+  return {
+    nama: $("nama").value.trim(),
+    nomorInduk,
+    tahun: tahunValue,
+    status: $("status").value,
+    tanggal: $("tanggal").value,
+    program: $("program").value.trim(),
+    ktp: $("ktp").value.trim(),
+    telepon: $("telepon").value.trim(),
+    alamat: $("alamat").value.trim()
+  };
+}
+
+form.addEventListener("submit", event => {
+  event.preventDefault();
+
+  try {
+    const data = ambilForm();
+
+    if (!data.nama || !data.nomorInduk) {
+      alert("Nama lengkap dan nomor induk wajib diisi.");
+      return;
+    }
+
+    const previousAlumni = alumni;
+
+    if (editId !== null) {
+      alumni = alumni.map(a =>
+        a.id === editId ? { ...a, ...data } : a
+      );
+    } else {
+      alumni = [...alumni, { id: buatId(), ...data }];
+    }
+
+    try {
+      simpanLokal();
+    } catch (error) {
+      alumni = previousAlumni;
+      throw error;
+    }
+
+    alert(editId !== null
+      ? "Data alumni berhasil diperbarui."
+      : "Data alumni berhasil ditambahkan.");
+
+    resetForm();
+    render();
+  } catch (error) {
+    alert(error.message || "Data gagal disimpan. Periksa penyimpanan browser.");
+  }
+});
+
+function resetForm() {
+  form.reset();
+  editId = null;
+  $("formTitle").textContent = "Tambah Data Alumni";
+  $("saveBtn").textContent = "Simpan Data";
+}
+
+$("resetBtn").addEventListener("click", resetForm);
+$("search").addEventListener("input", render);
+
+function editAlumni(id) {
+  const a = alumni.find(item => item.id === id);
+  if (!a) return;
+
+  editId = id;
+  $("nama").value = a.nama;
+  $("nomorInduk").value = a.nomorInduk;
+  $("tahun").value = a.tahun;
+  $("status").value = a.status;
+  $("tanggal").value = a.tanggal;
+  $("program").value = a.program;
+  $("ktp").value = a.ktp;
+  $("telepon").value = a.telepon;
+  $("alamat").value = a.alamat;
+
+  $("formTitle").textContent = "Edit Data Alumni";
+  $("saveBtn").textContent = "Simpan Perubahan";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function hapusAlumni(id) {
+  const a = alumni.find(item => item.id === id);
+  if (!a) return;
+
+  if (!confirm("Hapus data alumni " + a.nama + "?")) return;
+
+  const previousAlumni = alumni;
+  alumni = alumni.filter(item => item.id !== id);
+
+  try {
+    simpanLokal();
+  } catch (error) {
+    alumni = previousAlumni;
+    alert("Data gagal dihapus dari penyimpanan browser.");
+    return;
+  }
+
+  if (editId === id) resetForm();
+  render();
+}
+
+function buatSel(value) {
+  const td = document.createElement("td");
+  td.textContent = value == null || value === "" ? "—" : String(value);
+  return td;
+}
+
+function render() {
+  const query = normalisasi($("search").value);
+
+  const hasil = alumni.filter(a =>
+    normalisasi(a.nama).includes(query) ||
+    normalisasi(a.nomorInduk).includes(query)
+  );
+
+  $("totalAlumni").textContent = alumni.length;
+  $("totalTahun").textContent = new Set(
+    alumni.map(a => a.tahun).filter(Boolean)
+  ).size;
+  $("totalProgram").textContent = new Set(
+    alumni.map(a => normalisasi(a.program)).filter(Boolean)
+  ).size;
+  $("jumlahData").textContent =
+    hasil.length + " dari " + alumni.length + " data";
+
+  const tbody = $("alumniTable");
+  tbody.replaceChildren();
+
+  if (!hasil.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 11;
+    td.className = "empty";
+    td.textContent = alumni.length
+      ? "Data tidak ditemukan."
+      : "Belum ada data alumni.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  hasil.forEach((a, index) => {
+    const tr = document.createElement("tr");
+
+    [
+      index + 1, a.nama, a.nomorInduk, a.tahun, a.status,
+      a.tanggal, a.program, a.ktp, a.telepon, a.alamat
+    ].forEach(value => tr.appendChild(buatSel(value)));
+
+    const td = document.createElement("td");
+    const actions = document.createElement("div");
+    actions.className = "row-actions";
+
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "warning";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => editAlumni(a.id));
+
+    const hapus = document.createElement("button");
+    hapus.type = "button";
+    hapus.className = "danger";
+    hapus.textContent = "Hapus";
+    hapus.addEventListener("click", () => hapusAlumni(a.id));
+
+    actions.append(edit, hapus);
+    td.appendChild(actions);
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  });
+}
+
+// Pastikan library Excel tersedia sebelum menjalankan fitur Excel.
+function cekLibraryExcel() {
+  if (typeof XLSX === "undefined") {
+    alert(
+      "Library Excel belum berhasil dimuat. " +
+      "Periksa koneksi internet lalu muat ulang halaman."
+    );
+    return false;
+  }
+  return true;
+}
+
+// Download data alumni ke Excel.
+$("exportBtn").addEventListener("click", () => {
+  if (!cekLibraryExcel()) return;
+
+  if (alumni.length === 0) {
+    alert("Belum ada data alumni untuk diekspor.");
+    return;
+  }
+
+  try {
+    const rows = alumni.map(a => [
+      String(a.nama || ""),
+      String(a.nomorInduk || ""),
+      String(a.tahun || ""),
+      String(a.status || ""),
+      String(a.tanggal || ""),
+      String(a.program || ""),
+      String(a.ktp || ""),
+      String(a.telepon || ""),
+      String(a.alamat || "")
+    ]);
+
+    const worksheet = XLSX.utils.aoa_to_sheet([excelHeaders, ...rows]);
+    const workbook = XLSX.utils.book_new();
+
+    // Mempertahankan nomor identitas sebagai teks.
+    for (let r = 1; r <= rows.length; r++) {
+      [1, 6, 7].forEach(c => {
+        const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
+        if (cell) {
+          cell.t = "s";
+          cell.z = "@";
+        }
+      });
+    }
+
+    worksheet["!cols"] = [
+      { wch: 25 }, { wch: 18 }, { wch: 10 },
+      { wch: 16 }, { wch: 20 }, { wch: 25 },
+      { wch: 22 }, { wch: 18 }, { wch: 35 }
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Alumni");
+    XLSX.writeFile(workbook, "Data_Alumni_Pelatihan.xlsx");
+  } catch (error) {
+    console.error(error);
+    alert("Excel gagal dibuat. Periksa Console untuk detail error.");
+  }
+});
+
+// Download template dengan nama kolom yang harus dipertahankan.
+$("templateBtn").addEventListener("click", () => {
+  if (!cekLibraryExcel()) return;
+
+  try {
+    const worksheet = XLSX.utils.aoa_to_sheet([excelHeaders]);
+    worksheet["!cols"] = excelHeaders.map(() => ({ wch: 22 }));
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Template Alumni");
+    XLSX.writeFile(workbook, "Template_Import_Alumni.xlsx");
+  } catch (error) {
+    console.error(error);
+    alert("Template Excel gagal dibuat.");
+  }
+});
+
+// Buka pemilih file.
+$("importBtn").addEventListener("click", () => {
+  if (!cekLibraryExcel()) return;
+  $("excelFile").click();
+});
+
+function bersihkanPreview() {
+  pendingImport = [];
+  importHasErrors = false;
+  $("previewPanel").hidden = true;
+  $("previewHead").replaceChildren();
+  $("previewBody").replaceChildren();
+  $("previewInfo").textContent = "";
+  $("confirmImportBtn").disabled = true;
+  $("excelFile").value = "";
+}
+
+$("cancelImportBtn").addEventListener("click", bersihkanPreview);
+
+function tampilkanPreview(parsedRows, totalErrors, totalValid) {
+  const previewHead = $("previewHead");
+  const previewBody = $("previewBody");
+
+  previewHead.replaceChildren();
+  previewBody.replaceChildren();
+
+  const headRow = document.createElement("tr");
+  ["Baris", ...excelHeaders, "Validasi"].forEach(label => {
+    const th = document.createElement("th");
+    th.textContent = label;
+    headRow.appendChild(th);
+  });
+  previewHead.appendChild(headRow);
+
+  parsedRows.slice(0, 100).forEach(item => {
+    const tr = document.createElement("tr");
+    const values = [
+      item.excelRow,
+      ...fieldKeys.map(key => item.record[key]),
+      item.errors.length ? item.errors.join("; ") : "Siap diimpor"
+    ];
+
+    values.forEach((value, index) => {
+      const td = document.createElement("td");
+      td.textContent = String(value ?? "");
+
+      if (index === values.length - 1 && item.errors.length) {
+        td.style.color = "#dc2626";
+      }
+
+      tr.appendChild(td);
+    });
+
+    previewBody.appendChild(tr);
+  });
+
+  $("previewPanel").hidden = false;
+  $("previewInfo").textContent =
+    "Total " + parsedRows.length + " baris data. " +
+    totalValid + " baris valid. " +
+    totalErrors + " baris bermasalah." +
+    (parsedRows.length > 100
+      ? " Pratinjau menampilkan 100 baris pertama."
+      : "") +
+    (totalErrors
+      ? " Perbaiki file Excel lalu unggah ulang sebelum menyimpan."
+      : " Periksa data sebelum mengonfirmasi.");
+
+  $("confirmImportBtn").disabled =
+    totalErrors > 0 || totalValid === 0;
+}
+
+// Baca, validasi, dan tampilkan isi Excel.
+$("excelFile").addEventListener("change", event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!cekLibraryExcel()) {
+    event.target.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onerror = () => {
+    alert("File tidak berhasil dibaca.");
+    event.target.value = "";
+  };
+
+  reader.onload = e => {
+    try {
+      const workbook = XLSX.read(e.target.result, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      if (!sheet) throw new Error("File tidak memiliki lembar kerja.");
+
+      const data = XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+        defval: "",
+        raw: false
+      });
+
+      if (data.length < 2) {
+        alert("File Excel belum berisi baris data alumni.");
+        return;
+      }
+
+      const headers = data[0].map(normalisasi);
+      const columnIndexes = excelHeaders.map(
+        header => headers.indexOf(normalisasi(header))
+      );
+
+      const missing = excelHeaders.filter(
+        (_, index) => columnIndexes[index] === -1
+      );
+
+      if (missing.length) {
+        alert(
+          "Kolom berikut tidak ditemukan:\n- " +
+          missing.join("\n- ") +
+          "\n\nUnduh dan gunakan Template Import Alumni."
+        );
+        return;
+      }
+
+      const existingIds = new Set(
+        alumni.map(a => normalisasi(a.nomorInduk))
+      );
+      const importedIds = new Set();
+      const parsedRows = data.slice(1)
+        .map((row, index) => ({ row, excelRow: index + 2 }))
+        .filter(item =>
+          item.row.some(value => String(value ?? "").trim() !== "")
+        );
+
+      if (parsedRows.length === 0) {
+        alert("Tidak ada baris data untuk diimpor.");
+        return;
+      }
+
+      let totalErrors = 0;
+      pendingImport = [];
+
+      parsedRows.forEach(item => {
+        const get = index =>
+          String(item.row[columnIndexes[index]] ?? "").trim();
+
+        const record = {
+          nama: get(0),
+          nomorInduk: get(1),
+          tahun: get(2),
+          status: get(3),
+          tanggal: get(4),
+          program: get(5),
+          ktp: get(6),
+          telepon: get(7),
+          alamat: get(8)
+        };
+
+        const errors = [];
+
+        if (!record.nama) errors.push("Nama wajib diisi");
+        if (!record.nomorInduk) errors.push("Nomor induk wajib diisi");
+
+        const idKey = normalisasi(record.nomorInduk);
+
+        if (idKey && existingIds.has(idKey)) {
+          errors.push("Nomor induk sudah ada di sistem");
+        }
+
+        if (idKey && importedIds.has(idKey)) {
+          errors.push("Nomor induk duplikat dalam file");
+        }
+
+        if (idKey) importedIds.add(idKey);
+
+        if (record.tahun &&
+            (!/^\d{4}$/.test(record.tahun) ||
+             Number(record.tahun) < 1900 ||
+             Number(record.tahun) > 2200)) {
+          errors.push("Tahun tidak valid");
+        }
+
+        item.record = record;
+        item.errors = errors;
+
+        if (errors.length) {
+          totalErrors++;
+        } else {
+          pendingImport.push(record);
+        }
+      });
+
+      importHasErrors = totalErrors > 0;
+      tampilkanPreview(
+        parsedRows,
+        totalErrors,
+        pendingImport.length
+      );
+
+      if (totalErrors > 0) {
+        alert(
+          "Ditemukan " + totalErrors +
+          " baris bermasalah. Data belum disimpan. " +
+          "Perbaiki file lalu unggah kembali."
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      alert(
+        "File Excel tidak dapat dibaca. " +
+        "Pastikan file .xlsx atau .xls valid."
+      );
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+});
+
+// Simpan impor hanya jika semua baris lolos validasi.
+$("confirmImportBtn").addEventListener("click", () => {
+  if (importHasErrors || pendingImport.length === 0) {
+    alert("Import belum siap disimpan. Periksa validasi terlebih dahulu.");
+    return;
+  }
+
+  const newRecords = pendingImport.map(record => ({
+    id: buatId(),
+    ...record
+  }));
+
+  const previousAlumni = alumni;
+
+  try {
+    alumni = [...alumni, ...newRecords];
+    simpanLokal();
+
+    const jumlah = newRecords.length;
+    bersihkanPreview();
+    render();
+
+    alert(jumlah + " data alumni berhasil diimpor.");
+  } catch (error) {
+    alumni = previousAlumni;
+    console.error(error);
+    alert(
+      "Data gagal disimpan. Penyimpanan browser mungkin penuh " +
+      "atau tidak tersedia."
+    );
+  }
+});
+
+// Jalankan tampilan awal.
+render();
+</script>
+</body>
+</html>
