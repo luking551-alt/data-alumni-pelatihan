@@ -367,6 +367,7 @@
 "use strict";
 const SUPABASE_URL = "https://qjxxvlpmprrhtbuoeowl.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_woWtPMjGFKExlohZIpp1iQ_x3ylrMWu";
+const ADMIN_UID = "9bd8d934-e208-44f9-b13b-a9ca8a962e4b";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
@@ -401,8 +402,20 @@ async function loadAlumni() {
   render();
 }
 function tampilkanApp(user) {
-  $("loginPanel").hidden = true; $("appShell").hidden = false;
-  $("adminEmail").textContent = user.email || "Admin"; sessionReady = true;
+  if (!user) {
+    window.location.replace("akses.html");
+    return;
+  }
+
+  if (user.id !== ADMIN_UID) {
+    window.location.replace("user.html");
+    return;
+  }
+
+  $("loginPanel").hidden = true;
+  $("appShell").hidden = false;
+  $("adminEmail").textContent = user.email || "Admin";
+  sessionReady = true;
 }
 function tampilkanLogin() {
   $("loginPanel").hidden = false; $("appShell").hidden = true; sessionReady = false;
@@ -416,10 +429,11 @@ $("loginForm").addEventListener("submit", async event => {
       email: $("loginEmail").value.trim(), password: $("loginPassword").value
     });
     if (error) throw error;
-    if (!data.user || data.user.id !== "9bd8d934-e208-44f9-b13b-a9ca8a962e4b") {
-      await supabaseClient.auth.signOut();
-      throw new Error("Akun ini tidak diizinkan sebagai admin.");
-    }
+if (!data.user || data.user.id !== ADMIN_UID) {
+  await supabaseClient.auth.signOut();
+  window.location.replace("user.html");
+  return;
+}
     tampilkanApp(data.user);
     await loadAlumni();
   } catch (error) {
@@ -431,18 +445,32 @@ $("logoutBtn").addEventListener("click", async () => {
 });
 async function cekSesiAdmin() {
   try {
-    const { data, error } = await supabaseClient.auth.getSession();
+    const { data, error } =
+      await supabaseClient.auth.getSession();
+
     if (error) throw error;
-    const user = data.session && data.session.user;
-    if (user && user.id === "9bd8d934-e208-44f9-b13b-a9ca8a962e4b") {
-      tampilkanApp(user); await loadAlumni();
-    } else {
-      if (user) await supabaseClient.auth.signOut();
+
+    const user = data.session?.user;
+
+    if (!user) {
       tampilkanLogin();
+      return;
     }
+
+    if (user.id !== ADMIN_UID) {
+      window.location.replace("user.html");
+      return;
+    }
+
+    tampilkanApp(user);
+    await loadAlumni();
+
   } catch (error) {
-    console.error(error); tampilkanLogin();
-    $("loginError").textContent = "Gagal memeriksa sesi. Muat ulang halaman.";
+    console.error("Gagal memeriksa sesi admin:", error);
+    tampilkanLogin();
+
+    $("loginError").textContent =
+      "Gagal memeriksa sesi. Muat ulang halaman.";
   }
 }
 function normalisasi(value) { return String(value ?? "").trim().toLowerCase(); }
