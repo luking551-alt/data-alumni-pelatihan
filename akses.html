@@ -138,6 +138,7 @@ small {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+
 "use strict";
 
 const SUPABASE_URL =
@@ -169,6 +170,33 @@ function showError(text) {
   message.textContent = text;
 }
 
+function arahkanBerdasarkanAkun(user) {
+  if (!user) return;
+
+  const tujuan =
+    user.id === ADMIN_UID
+      ? "dashboard.html"
+      : "user.html";
+
+  window.location.replace(tujuan);
+}
+
+async function periksaSesi() {
+  try {
+    const { data, error } =
+      await supabaseClient.auth.getSession();
+
+    if (error) throw error;
+
+    if (data.session?.user) {
+      arahkanBerdasarkanAkun(data.session.user);
+    }
+  } catch (error) {
+    console.error("Pemeriksaan sesi gagal:", error);
+    showError("Gagal memeriksa sesi. Silakan muat ulang halaman.");
+  }
+}
+
 googleBtn.addEventListener("click", async () => {
   googleBtn.disabled = true;
   googleBtnText.textContent = "Menghubungkan ke Google...";
@@ -180,32 +208,28 @@ googleBtn.addEventListener("click", async () => {
 
     if (sessionError) throw sessionError;
 
-    // Jika sudah login, arahkan berdasarkan UID akun.
     if (data.session?.user) {
-      const destination =
-        data.session.user.id === ADMIN_UID
-          ? "dashboard.html"
-          : "user.html";
-
-      window.location.replace(destination);
+      arahkanBerdasarkanAkun(data.session.user);
       return;
     }
 
-    // Jika belum login, mulai autentikasi Google.
-    const redirectUrl = new URL("user.html", window.location.href);
+    const redirectUrl = new URL(
+      "akses.html",
+      window.location.href
+    );
+
     redirectUrl.search = "";
     redirectUrl.hash = "";
 
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: redirectUrl.href
-      }
-    });
+    const { error } =
+      await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectUrl.href
+        }
+      });
 
     if (error) throw error;
-
-    // Supabase akan mengalihkan browser ke Google.
   } catch (error) {
     console.error("Login Google gagal:", error);
 
@@ -218,6 +242,19 @@ googleBtn.addEventListener("click", async () => {
     googleBtnText.textContent = "Masuk dengan Google (User)";
   }
 });
+
+// Periksa sesi saat halaman dibuka kembali setelah login Google.
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (
+    session?.user &&
+    (event === "SIGNED_IN" || event === "INITIAL_SESSION")
+  ) {
+    arahkanBerdasarkanAkun(session.user);
+  }
+});
+
+periksaSesi();
+
 </script>
 </body>
 </html>
