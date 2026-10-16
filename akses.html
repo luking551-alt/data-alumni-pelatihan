@@ -1,42 +1,224 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#12365b"><title>Pilih Akses — Data Alumni</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#12365b">
+<title>Pilih Akses — Data Alumni</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#eaf3ff,#f8fafc);color:#172b4d;min-height:100vh;display:grid;place-items:center;padding:20px}
-.card{width:min(100%,520px);background:#fff;border-radius:20px;padding:32px;box-shadow:0 18px 50px #12365b1c;text-align:center}
-.logo{width:76px;height:76px;object-fit:contain;margin-bottom:12px}h1{font-size:24px;margin:8px 0}p{color:#64748b;line-height:1.5}
-button,a.btn{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;padding:14px 16px;border-radius:10px;border:0;text-decoration:none;font-weight:700;font-size:15px;cursor:pointer;margin-top:14px}
-.admin{background:#12365b;color:white}.google{background:#fff;color:#263238;border:1px solid #cbd5e1}.google svg{width:20px;height:20px}
-#message{min-height:20px;font-size:13px;color:#b91c1c;margin-top:12px}
-small{display:block;margin-top:20px;color:#94a3b8}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #eaf3ff, #f8fafc);
+  color: #172b4d;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.card {
+  width: min(100%, 520px);
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 18px 50px #12365b1c;
+  text-align: center;
+}
+
+.logo {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 24px;
+  margin: 8px 0;
+}
+
+p {
+  color: #64748b;
+  line-height: 1.5;
+}
+
+button, a.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 0;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 14px;
+}
+
+button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.admin {
+  background: #12365b;
+  color: white;
+}
+
+.google {
+  background: #fff;
+  color: #263238;
+  border: 1px solid #cbd5e1;
+}
+
+.google svg {
+  width: 20px;
+  height: 20px;
+}
+
+#message {
+  min-height: 20px;
+  font-size: 13px;
+  color: #b91c1c;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+
+small {
+  display: block;
+  margin-top: 20px;
+  color: #94a3b8;
+}
+
+@media (max-width: 480px) {
+  .card { padding: 24px 18px; }
+  h1 { font-size: 21px; }
+}
 </style>
-</head><body><main class="card">
-<img class="logo" src="assets/logo-alumni.png" alt="Logo Data Alumni" onerror="this.style.display='none'">
-<h1>DATA ALUMNI PESERTA PELATIHAN</h1><p>Pilih jenis akses untuk melanjutkan.</p>
-<a class="btn admin" href="dashboard.html">Login Admin</a>
-<button class="google" id="googleBtn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.08 46.98 31.3 46.98 24.55z"/><path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.44-4.89 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Masuk dengan Google (User)</button>
-<div id="message" role="status"></div><small>User hanya dapat melihat enam kolom data alumni.</small>
+</head>
+
+<body>
+<main class="card">
+  <img
+    class="logo"
+    src="assets/logo-alumni.png"
+    alt="Logo Data Alumni"
+    onerror="this.style.display='none'"
+  >
+
+  <h1>DATA ALUMNI PESERTA PELATIHAN</h1>
+  <p>Pilih jenis akses untuk melanjutkan.</p>
+
+  <a class="btn admin" href="dashboard.html">
+    Login Admin
+  </a>
+
+  <button class="google" id="googleBtn" type="button">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.08 46.98 31.3 46.98 24.55z"/>
+      <path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19z"/>
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.14 1.44-4.89 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+    </svg>
+    <span id="googleBtnText">Masuk dengan Google (User)</span>
+  </button>
+
+  <div id="message" role="status" aria-live="polite"></div>
+
+  <small>User hanya dapat melihat enam kolom data alumni.</small>
 </main>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+"use strict";
+
+const SUPABASE_URL =
+  "https://qjxxvlpmprrhtbuoeowl.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_woWtPMjGFKExlohZIpp1iQ_x3ylrMWu";
+
+const ADMIN_UID =
+  "9bd8d934-e208-44f9-b13b-a9ca8a962e4b";
+
 const supabaseClient = window.supabase.createClient(
-  "https://qjxxvlpmprrhtbuoeowl.supabase.co",
-  "sb_publishable_woWtPMjGFKExlohZIpp1iQ_x3ylrMWu"
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
 );
-const ADMIN_UID = "9bd8d934-e208-44f9-b13b-a9ca8a962e4b";
-document.getElementById("googleBtn").addEventListener("click", async () => {
-  const btn = document.getElementById("googleBtn"), msg = document.getElementById("message");
-  btn.disabled = true; msg.textContent = "";
+
+const googleBtn = document.getElementById("googleBtn");
+const googleBtnText = document.getElementById("googleBtnText");
+const message = document.getElementById("message");
+
+function showError(text) {
+  message.textContent = text;
+}
+
+googleBtn.addEventListener("click", async () => {
+  googleBtn.disabled = true;
+  googleBtnText.textContent = "Menghubungkan ke Google...";
+  message.textContent = "";
+
   try {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session?.user?.id === ADMIN_UID) { location.href = "dashboard.html"; return; }
+    const { data, error: sessionError } =
+      await supabaseClient.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    // Jika sudah login, arahkan berdasarkan UID akun.
+    if (data.session?.user) {
+      const destination =
+        data.session.user.id === ADMIN_UID
+          ? "dashboard.html"
+          : "user.html";
+
+      window.location.replace(destination);
+      return;
+    }
+
+    // Jika belum login, mulai autentikasi Google.
+    const redirectUrl = new URL("user.html", window.location.href);
+    redirectUrl.search = "";
+    redirectUrl.hash = "";
+
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: new URL("user.html", location.href).href }
+      options: {
+        redirectTo: redirectUrl.href
+      }
     });
+
     if (error) throw error;
-  } catch (e) { msg.textContent = e.message || "Login Google gagal."; btn.disabled = false; }
+
+    // Supabase akan mengalihkan browser ke Google.
+  } catch (error) {
+    console.error("Login Google gagal:", error);
+
+    showError(
+      error?.message ||
+      "Login Google gagal. Silakan coba kembali."
+    );
+
+    googleBtn.disabled = false;
+    googleBtnText.textContent = "Masuk dengan Google (User)";
+  }
 });
-</script></body></html>
+</script>
+</body>
+</html>
+```
