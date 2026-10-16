@@ -1,0 +1,26 @@
+DATA ALUMNI PESERTA PELATIHAN — VERSI DENGAN AKSES USER GOOGLE
+
+File tambahan:
+- akses.html: halaman pilihan Login Admin / Masuk dengan Google (User)
+- user.html: halaman baca-saja yang menampilkan enam kolom
+- sql-user-access.sql: definisi fungsi RPC baca enam kolom
+- dashboard.html: dashboard Admin asli, tidak diubah
+- index.html dan aset asli tetap dipertahankan
+
+PENTING:
+1. Buat backup file dan jangan hapus versi lama.
+2. Unggah folder proyek ke hosting setelah pengujian. Halaman akses baru: /akses.html.
+3. Di Supabase Dashboard > Authentication > URL Configuration, masukkan URL website produksi ke Site URL dan tambahkan URL callback yang diperlukan ke Redirect URLs, misalnya:
+   https://DOMAIN-WEBSITE-ANDA/user.html
+   Gunakan domain Vercel sebenarnya, bukan teks contoh.
+4. Di Supabase Dashboard > Authentication > Sign In / Providers > Google, aktifkan Google dan isi Client ID serta Client Secret dari Google Cloud Console. Google Cloud OAuth client perlu memiliki Authorized redirect URI yang persis sama dengan callback URL Supabase yang ditampilkan Supabase.
+5. Jalankan sql-user-access.sql di Supabase SQL Editor jika fungsi belum tersedia. Jangan hapus policy Admin yang sudah ada.
+6. Uji dengan akun Google non-admin: harus diarahkan ke user.html dan hanya melihat enam kolom. Uji akun admin: dashboard.html tetap memakai login Admin yang sudah ada.
+7. Jangan letakkan service_role key di file HTML/JavaScript. Publishable key boleh ada di browser.
+8. Halaman akses ini adalah tambahan, bukan pengganti index.html. Untuk sementara buka /akses.html untuk mencoba alur login.
+
+Catatan teknis:
+- Dashboard Admin asli dipertahankan tanpa modifikasi.
+- User page meminta data melalui RPC `lihat_alumni_user`, bukan membaca tabel `alumni` secara langsung.
+- Fungsi RPC mengembalikan nama, nomor induk, tahun, status, program, dan tanggal saja.
+- Ini adalah paket perubahan awal; Google OAuth tetap harus dikonfigurasi di dashboard Supabase dan Google Cloud sebelum tombol login berhasil.

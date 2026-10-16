@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#12365b"><title>Data Alumni — User</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#1e293b;font-family:Arial,sans-serif}
+header{background:#12365b;color:white;padding:22px 5%;display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+h1{font-size:22px;margin:0 0 5px}.sub{opacity:.85;font-size:14px}button{border:0;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer}
+.logout{background:#fff;color:#12365b}.wrap{max-width:1200px;margin:24px auto;padding:0 16px}.panel{background:#fff;border-radius:14px;padding:20px;box-shadow:0 5px 20px #0f172a0a}
+.tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}.tools input{padding:11px;border:1px solid #cbd5e1;border-radius:8px;min-width:220px;flex:1}
+.note{font-size:13px;color:#64748b;margin:0 0 14px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:800px}th,td{padding:12px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:14px}th{background:#e8f1fb;color:#12365b;white-space:nowrap}td{overflow-wrap:anywhere}#message{padding:20px;color:#475569}
+</style></head><body>
+<header><div><h1>DATA ALUMNI PESERTA PELATIHAN</h1><div class="sub">Halaman User · hanya lihat data</div></div><button class="logout" id="logoutBtn">Keluar</button></header>
+<main class="wrap"><section class="panel"><div class="tools"><input id="search" placeholder="Cari nama, nomor induk, atau program..." aria-label="Cari data"><span id="count">Memuat data…</span></div>
+<p class="note">Akun User hanya dapat melihat enam kolom. Fitur tambah, edit, hapus, dan Excel tidak tersedia.</p>
+<div class="tablewrap"><table><thead><tr><th>No.</th><th>Nama Lengkap</th><th>Nomor Induk</th><th>Tahun</th><th>Status</th><th>Program Pelatihan</th><th>Tanggal Pendataan</th></tr></thead><tbody id="rows"><tr><td colspan="7">Memeriksa sesi login…</td></tr></tbody></table></div>
+<div id="message" role="status"></div></section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+"use strict";
+const client = window.supabase.createClient(
+ "https://qjxxvlpmprrhtbuoeowl.supabase.co",
+ "sb_publishable_woWtPMjGFKExlohZIpp1iQ_x3ylrMWu"
+);
+const ADMIN_UID = "9bd8d934-e208-44f9-b13b-a9ca8a962e4b";
+let alumni = [];
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function render() {
+ const q = document.getElementById("search").value.trim().toLocaleLowerCase("id");
+ const found = alumni.filter(a => [a.nama_lengkap,a.nomor_induk,a.program_pelatihan,a.status]
+   .some(v => String(v ?? "").toLocaleLowerCase("id").includes(q)));
+ const tbody = document.getElementById("rows"); tbody.replaceChildren();
+ document.getElementById("count").textContent = found.length + " dari " + alumni.length + " data";
+ if (!found.length) { const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=7;td.textContent="Data tidak ditemukan.";tr.append(td);tbody.append(tr);return; }
+ found.forEach((a,i) => {
+   const tr=document.createElement("tr");
+   [i+1,a.nama_lengkap,a.nomor_induk,a.tahun_pelatihan,a.status,a.program_pelatihan,a.tanggal_pendataan]
+     .forEach(v=>{const td=document.createElement("td");td.textContent=(v===null||v===undefined||v==="")?"—":String(v);tr.append(td);});
+   tbody.append(tr);
+ });
+}
+async function init() {
+ const msg=document.getElementById("message");
+ try {
+  const {data,error}=await client.auth.getSession(); if(error) throw error;
+  const user=data.session?.user;
+  if(!user){location.replace("akses.html");return;}
+  if(user.id===ADMIN_UID){location.replace("dashboard.html");return;}
+  const {data:rows,error:rpcError}=await client.rpc("lihat_alumni_user");
+  if(rpcError) throw rpcError;
+  alumni=rows||[]; render();
+ } catch(e) { console.error(e);msg.textContent="Data belum dapat dimuat: "+(e.message||"Terjadi kesalahan")+". Pastikan Google OAuth dan fungsi RPC sudah dikonfigurasi."; }
+}
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("logoutBtn").addEventListener("click",async()=>{await client.auth.signOut();location.replace("akses.html");});
+client.auth.onAuthStateChange((_event,session)=>{if(!session) location.replace("akses.html");});
+init();
+</script></body></html>
