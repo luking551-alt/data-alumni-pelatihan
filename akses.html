@@ -181,22 +181,6 @@ function arahkanBerdasarkanAkun(user) {
   window.location.replace(tujuan);
 }
 
-async function periksaSesi() {
-  try {
-    const { data, error } =
-      await supabaseClient.auth.getSession();
-
-    if (error) throw error;
-
-    if (data.session?.user) {
-      arahkanBerdasarkanAkun(data.session.user);
-    }
-  } catch (error) {
-    console.error("Pemeriksaan sesi gagal:", error);
-    showError("Gagal memeriksa sesi. Silakan muat ulang halaman.");
-  }
-}
-
 googleBtn.addEventListener("click", async () => {
   googleBtn.disabled = true;
   googleBtnText.textContent = "Menghubungkan ke Google...";
@@ -242,18 +226,6 @@ googleBtn.addEventListener("click", async () => {
     googleBtnText.textContent = "Masuk dengan Google (User)";
   }
 });
-
-// Periksa sesi saat halaman dibuka kembali setelah login Google.
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (
-    session?.user &&
-    (event === "SIGNED_IN" || event === "INITIAL_SESSION")
-  ) {
-    arahkanBerdasarkanAkun(session.user);
-  }
-});
-
-periksaSesi();
 
 </script>
 </body>
