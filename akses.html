@@ -187,16 +187,7 @@ googleBtn.addEventListener("click", async () => {
   message.textContent = "";
 
   try {
-    const { data, error: sessionError } =
-      await supabaseClient.auth.getSession();
-
-    if (sessionError) throw sessionError;
-
-    if (data.session?.user) {
-      arahkanBerdasarkanAkun(data.session.user);
-      return;
-    }
-
+    
     const redirectUrl = new URL(
       "akses.html",
       window.location.href
