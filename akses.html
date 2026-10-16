@@ -82,6 +82,7 @@ button:disabled {
 .google svg {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 #message {
@@ -138,7 +139,6 @@ small {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-
 "use strict";
 
 const SUPABASE_URL =
@@ -166,12 +166,22 @@ const googleBtn = document.getElementById("googleBtn");
 const googleBtnText = document.getElementById("googleBtnText");
 const message = document.getElementById("message");
 
+// Halaman akses tetap tampil saat dibuka secara biasa.
+const currentUrl = new URL(window.location.href);
+const isOAuthCallback =
+  currentUrl.searchParams.has("code") ||
+  currentUrl.hash.includes("access_token=");
+
+let redirectStarted = false;
+
 function showError(text) {
   message.textContent = text;
 }
 
 function arahkanBerdasarkanAkun(user) {
-  if (!user) return;
+  if (!user || redirectStarted) return;
+
+  redirectStarted = true;
 
   const tujuan =
     user.id === ADMIN_UID
@@ -181,13 +191,57 @@ function arahkanBerdasarkanAkun(user) {
   window.location.replace(tujuan);
 }
 
+// Hanya arahkan otomatis jika halaman ini merupakan
+// halaman callback setelah proses login Google.
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (
+    isOAuthCallback &&
+    session?.user &&
+    (event === "SIGNED_IN" || event === "INITIAL_SESSION")
+  ) {
+    arahkanBerdasarkanAkun(session.user);
+  }
+});
+
+// Pemeriksaan tambahan untuk menangani callback OAuth.
+async function prosesCallbackGoogle() {
+  if (!isOAuthCallback) return;
+
+  try {
+    const { data, error } =
+      await supabaseClient.auth.getSession();
+
+    if (error) throw error;
+
+    if (data.session?.user) {
+      arahkanBerdasarkanAkun(data.session.user);
+      return;
+    }
+
+    showError(
+      "Sesi login belum tersedia. Silakan coba login kembali."
+    );
+  } catch (error) {
+    console.error("Pemeriksaan callback gagal:", error);
+    showError(
+      "Login belum berhasil. Silakan muat ulang halaman dan coba kembali."
+    );
+  }
+}
+
 googleBtn.addEventListener("click", async () => {
   googleBtn.disabled = true;
   googleBtnText.textContent = "Menghubungkan ke Google...";
   message.textContent = "";
 
   try {
-    
+    // Hapus sesi lokal yang sebelumnya tersimpan agar
+    // akun Google lain dapat dipilih untuk login.
+    const { error: signOutError } =
+      await supabaseClient.auth.signOut({ scope: "local" });
+
+    if (signOutError) throw signOutError;
+
     const redirectUrl = new URL(
       "akses.html",
       window.location.href
@@ -200,7 +254,10 @@ googleBtn.addEventListener("click", async () => {
       await supabaseClient.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: redirectUrl.href
+          redirectTo: redirectUrl.href,
+          queryParams: {
+            prompt: "select_account"
+          }
         }
       });
 
@@ -218,6 +275,7 @@ googleBtn.addEventListener("click", async () => {
   }
 });
 
+prosesCallbackGoogle();
 </script>
 </body>
 </html>
